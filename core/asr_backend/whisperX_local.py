@@ -13,27 +13,34 @@ MODEL_DIR = load_key("model_dir")
 
 @except_handler("failed to check hf mirror", default_return=None)
 def check_hf_mirror():
-    mirrors = {'Official': 'huggingface.co', 'Mirror': 'hf-mirror.com'}
-    fastest_url = f"https://{mirrors['Official']}"
-    best_time = float('inf')
-    rprint("[cyan]🔍 Checking HuggingFace mirrors...[/cyan]")
-    for name, domain in mirrors.items():
-        if os.name == 'nt':
-            cmd = ['ping', '-n', '1', '-w', '3000', domain]
-        else:
-            cmd = ['ping', '-c', '1', '-W', '3', domain]
-        start = time.time()
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        response_time = time.time() - start
-        if result.returncode == 0:
-            if response_time < best_time:
-                best_time = response_time
-                fastest_url = f"https://{domain}"
-            rprint(f"[green]✓ {name}:[/green] {response_time:.2f}s")
-    if best_time == float('inf'):
-        rprint("[yellow]⚠️ All mirrors failed, using default[/yellow]")
-    rprint(f"[cyan]🚀 Selected mirror:[/cyan] {fastest_url} ({best_time:.2f}s)")
-    return fastest_url
+    """检查HuggingFace镜像连接，使用HTTP请求替代ping"""
+    import requests
+    import time
+    
+    # 测试的镜像地址
+    mirrors = [
+        "https://huggingface.co",
+        "https://hf-mirror.com", 
+        "https://huggingface.co"
+    ]
+    
+    for mirror in mirrors:
+        try:
+            # 使用HTTP HEAD请求测试连接
+            response = requests.head(mirror, timeout=5)
+            if response.status_code < 400:
+                print(f"✅ 使用镜像: {mirror}")
+                if "hf-mirror.com" in mirror:
+                    return "https://hf-mirror.com"
+                else:
+                    return "https://huggingface.co"
+        except Exception as e:
+            print(f"❌ 镜像 {mirror} 连接失败: {e}")
+            continue
+    
+    # 如果所有镜像都失败，返回默认值
+    print("⚠️ 所有镜像测试失败，使用默认HuggingFace")
+    return "https://huggingface.co"
 
 @except_handler("WhisperX processing error:")
 def transcribe_audio(raw_audio_file, vocal_audio_file, start, end):
