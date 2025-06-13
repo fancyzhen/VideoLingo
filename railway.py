@@ -1,34 +1,20 @@
 import os
-import subprocess
-import sys
 
-# Railway环境配置
-PORT = os.environ.get('PORT', '8080')
-
-print("🚄 Railway VideoLingo 启动中...")
-
-# 检查环境变量
-required_env = ['API_KEY', 'BASE_URL', 'MODEL']
-for env_var in required_env:
-    if not os.environ.get(env_var):
-        print(f"⚠️ 警告：环境变量 {env_var} 未设置")
-
-# 创建必要目录
-os.makedirs('output/log', exist_ok=True)
-os.makedirs('_model_cache', exist_ok=True)
-
-print("✅ 环境检查完成")
-print(f"🚀 在端口 {PORT} 启动服务...")
-
-# 启动Streamlit
-try:
-    subprocess.run([
-        'streamlit', 'run', 'st.py',
-        '--server.port', PORT,
-        '--server.address', '0.0.0.0',
-        '--server.headless', 'true',
-        '--server.enableCORS', 'false'
-    ])
-except Exception as e:
-    print(f"❌ 启动失败：{e}")
-    sys.exit(1)
+# 检查Claude API配置
+def check_claude_config():
+    api_key = os.environ.get('sk-QzOKB3kU82rZcuh6Sy13oGm8pqjEFLQg5pQ3WlBwFUoDv08E')
+    base_url = os.environ.get('BASE_URL', 'https://api.302.ai')
+    model = os.environ.get('MODEL', 'claude-3-5-sonnet-20241022')
+    
+    if not api_key:
+        logger.error("❌ API_KEY环境变量未设置")
+        return False
+        
+    if not api_key.startswith('sk-302ai-'):
+        logger.warning("⚠️ API密钥格式可能不正确")
+    
+    logger.info(f"✅ Claude配置检查通过")
+    logger.info(f"📡 Base URL: {base_url}")
+    logger.info(f"🤖 Model: {model}")
+    
+    return True
