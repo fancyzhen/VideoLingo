@@ -1,40 +1,20 @@
-display_language: "zh-CN"
-
-# API配置 - 使用环境变量
-api:
-  key: ${API_KEY}
-  base_url: ${BASE_URL}
-  model: ${MODEL}
-  llm_support_json: false
-
+# LLM配置 - 使用302.ai的Claude
+llm:
+  api_key: "sk-QzOKB3kU82rZcuh6Sy13oGm8pqjEFLQg5pQ3WlBwFUoDv08E"  # 替换为您的API密钥
+  base_url: "https://api.302.ai"      # 302.ai的API地址
+  model: "claude-3-5-sonnet-20241022" # Claude模型名称
+  
 # 语言设置
-target_language: '简体中文'
+target_language: "简体中文"
 
-# Railway优化配置
-max_workers: 4  # Railway性能更好，可以增加并发
-port: ${PORT}   # Railway动态端口
-
-# Whisper设置
+# 其他推荐设置
 whisper:
-  model: 'base'
-  language: 'en'
-  runtime: 'local'
-
-# TTS设置
-tts_method: 'edge_tts'
-
+  model: "large-v3"
+  device: "cpu"
+  
+tts:
+  method: "edge_tts"  # 使用免费的Edge TTS
+  
 # 性能优化
-demucs: false
-ffmpeg_gpu: false
-burn_subtitles: true
-ytb_resolution: '1080'
-
-# Edge TTS配置
-edge_tts:
-  voice: 'zh-CN-XiaoxiaoNeural'
-
-# 音频速度设置
-speed_factor:
-  min: 1
-  accept: 1.2
-  max: 1.4
+max_workers: 4
+chunk_size: 1000
