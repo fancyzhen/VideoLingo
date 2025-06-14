@@ -13,34 +13,19 @@ MODEL_DIR = load_key("model_dir")
 
 @except_handler("failed to check hf mirror", default_return=None)
 def check_hf_mirror():
-    """检查HuggingFace镜像连接，使用HTTP请求替代ping"""
-    import requests
-    import time
+    """
+    修复版本：直接返回HuggingFace官方地址，避免ping命令
+    适用于Railway等容器环境
+    """
+    import os
     
-    # 测试的镜像地址
-    mirrors = [
-        "https://huggingface.co",
-        "https://hf-mirror.com", 
-        "https://huggingface.co"
-    ]
+    # 直接返回官方HuggingFace地址，跳过网络检测
+    hf_endpoint = "https://huggingface.co"
     
-    for mirror in mirrors:
-        try:
-            # 使用HTTP HEAD请求测试连接
-            response = requests.head(mirror, timeout=5)
-            if response.status_code < 400:
-                print(f"✅ 使用镜像: {mirror}")
-                if "hf-mirror.com" in mirror:
-                    return "https://hf-mirror.com"
-                else:
-                    return "https://huggingface.co"
-        except Exception as e:
-            print(f"❌ 镜像 {mirror} 连接失败: {e}")
-            continue
+    print(f"🔧 使用默认HuggingFace端点: {hf_endpoint}")
+    print("✅ 跳过网络检测，避免ping命令错误")
     
-    # 如果所有镜像都失败，返回默认值
-    print("⚠️ 所有镜像测试失败，使用默认HuggingFace")
-    return "https://huggingface.co"
+    return hf_endpoint
 
 @except_handler("WhisperX processing error:")
 def transcribe_audio(raw_audio_file, vocal_audio_file, start, end):
