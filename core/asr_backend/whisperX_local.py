@@ -5,15 +5,7 @@ import torch
 from pathlib import Path
 
 def check_hf_mirror():
-    """
-    紧急修复版本：直接返回HuggingFace官方地址
-    解决Railway环境中ping命令不存在的问题
-    """
-    # 直接返回官方地址，跳过所有网络检测
-    hf_endpoint = "https://huggingface.co"
-    print(f"✅ 使用HuggingFace官方端点: {hf_endpoint}")
-    print("🔧 已跳过ping检测，避免容器环境错误")
-    return hf_endpoint
+    return "https://huggingface.co"
 
 def transcribe_audio(audio_file, vocal_file, start_time=None, end_time=None):
     """
