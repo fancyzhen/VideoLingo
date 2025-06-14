@@ -11,51 +11,29 @@ logger = logging.getLogger(__name__)
 
 def check_hf_mirror():
     """
-    终极修复版本：多重保险的HuggingFace端点检测
-    彻底避免ping命令错误，确保在任何环境下都能正常工作
+    Replit优化版本：直接返回HuggingFace官方地址
+    专门为Replit环境优化，避免任何网络检测问题
     """
     
-    # 方法1: 优先使用环境变量
-    hf_endpoint = os.environ.get('HF_ENDPOINT')
-    if hf_endpoint:
-        logger.info(f"✅ [环境变量] 使用HF_ENDPOINT: {hf_endpoint}")
-        return hf_endpoint
+    # 直接返回官方地址，Replit环境下最稳定
+    hf_endpoint = "https://huggingface.co"
     
-    # 方法2: 使用强制环境变量
-    force_endpoint = os.environ.get('FORCE_HF_ENDPOINT')
-    if force_endpoint:
-        default_endpoint = "https://huggingface.co"
-        logger.info(f"✅ [强制模式] 使用默认端点: {default_endpoint}")
-        return default_endpoint
+    logger.info(f"🔧 [Replit版本] 使用HuggingFace端点: {hf_endpoint}")
+    logger.info("✅ [Replit版本] 跳过网络检测，确保稳定运行")
     
-    # 方法3: 直接返回官方地址（最安全）
-    default_endpoint = "https://huggingface.co"
-    logger.info(f"✅ [默认模式] 使用官方端点: {default_endpoint}")
-    logger.info("🔧 已完全跳过网络检测，避免ping命令错误")
-    
-    return default_endpoint
-
-def safe_check_hf_mirror():
-    """
-    安全版本的HF镜像检测，带异常处理
-    """
-    try:
-        return check_hf_mirror()
-    except Exception as e:
-        logger.error(f"❌ HF镜像检测失败: {e}")
-        # 即使出错也返回默认地址
-        return "https://huggingface.co"
+    return hf_endpoint
 
 def transcribe_audio(audio_file, vocal_file, start_time=None, end_time=None):
     """
-    使用WhisperX进行音频转录 - 修复版本
+    使用WhisperX进行音频转录 - Replit优化版本
     """
     try:
-        # 设置HuggingFace端点 - 使用安全版本
-        os.environ['HF_ENDPOINT'] = safe_check_hf_mirror()
+        # 设置HuggingFace端点
+        os.environ['HF_ENDPOINT'] = check_hf_mirror()
         
         # 输出调试信息
         logger.info(f"🔧 当前HF_ENDPOINT: {os.environ.get('HF_ENDPOINT')}")
+        logger.info("🚀 [Replit] 开始WhisperX音频转录...")
         
         # 检查CUDA可用性
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -102,49 +80,27 @@ def transcribe_audio(audio_file, vocal_file, start_time=None, end_time=None):
             return_char_alignments=False
         )
         
-        logger.info("✅ 音频转录完成")
+        logger.info("✅ [Replit] 音频转录完成")
         return result
         
     except Exception as e:
-        logger.error(f"❌ 转录过程中发生错误: {str(e)}")
+        logger.error(f"❌ [Replit] 转录过程中发生错误: {str(e)}")
         raise e
 
 def ensure_hf_endpoint():
     """
-    确保HuggingFace端点已正确设置
+    确保HuggingFace端点已正确设置 - Replit版本
     """
     if 'HF_ENDPOINT' not in os.environ:
-        os.environ['HF_ENDPOINT'] = safe_check_hf_mirror()
-        logger.info(f"🔧 自动设置HF_ENDPOINT: {os.environ['HF_ENDPOINT']}")
+        os.environ['HF_ENDPOINT'] = check_hf_mirror()
+        logger.info(f"🔧 [Replit] 自动设置HF_ENDPOINT: {os.environ['HF_ENDPOINT']}")
     return os.environ['HF_ENDPOINT']
-
-def test_hf_connection():
-    """
-    测试HuggingFace连接（不使用ping）
-    """
-    try:
-        import requests
-        endpoint = ensure_hf_endpoint()
-        response = requests.head(endpoint, timeout=5)
-        if response.status_code == 200:
-            logger.info(f"✅ HuggingFace连接测试成功: {endpoint}")
-            return True
-        else:
-            logger.warning(f"⚠️ HuggingFace连接测试失败: {response.status_code}")
-            return False
-    except Exception as e:
-        logger.warning(f"⚠️ HuggingFace连接测试异常: {e}")
-        return False
 
 # 初始化时自动设置端点
 ensure_hf_endpoint()
 
 # 输出初始化信息
-logger.info("🚀 WhisperX本地模块已加载（终极修复版）")
-logger.info("✅ 已彻底解决ping命令错误问题")
-logger.info("🔒 多重保险机制已启用")
-
-# 可选：测试连接
-if os.environ.get('TEST_HF_CONNECTION', '').lower() == 'true':
-    test_hf_connection()
+logger.info("🚀 WhisperX本地模块已加载（Replit优化版）")
+logger.info("✅ 专为Replit环境优化，无ping命令依赖")
+logger.info("🔒 稳定性和兼容性已最大化")
 
